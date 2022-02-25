@@ -1,0 +1,47 @@
+version: '3'
+services:
+  website:
+    container_name: php73
+    # image: tut:php_img
+    # image: usmana/php:7.3
+    image: localhost_php7.3mysql8.0
+    build:
+      context: ./
+    volumes:
+      # - ./../blog-v5.4.30:/var/www/html
+      - ./../../../../../../../projects:/var/www/html
+    ports:
+      - 8073:80
+      # - 6001:6001
+    depends_on:
+      - mariadb
+      - mongodb
+  mariadb:
+    image: mariadb:10.4.18
+    container_name: mariadb-server
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./database:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - lower_case_table_names=1
+    ports:
+      - "8082:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      - MYSQL_ROOT_PASSWORD=5678
+      - PMA_HOST=mariadb
+    ports:
+      - 9073:80
+  mongodb:
+    image: mongo:4.4.12
+    container_name: mongodb
+    restart: always
+    volumes:
+      - ./mongodb:/data/db
+    ports:
+      - "27017:27017"
+    command: --storageEngine wiredTiger
